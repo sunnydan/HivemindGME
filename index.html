@@ -1,1 +1,128 @@
-hello world
+<html>
+
+<head>
+  <title>The Hivemind GM Emulator</title>
+  <link rel="stylesheet" type="text/css" href="hivemind.css">
+  <script src='https://cdn.scaledrone.com/scaledrone.min.js'></script>
+  <script src="hivemind.js"></script>
+</head>
+
+<body>
+  <header class="centerInParent">
+    <div class="actuallyBlock centerText">
+      <h1 class="noMarginNoPadding" id="programtitle">The Hivemind GM Emulator v1.0</h1>
+      <div id="preJoinControls">
+        <span id="notConnected">Not currently connected to any room.</span>
+        <span id="usernameIsRequired" style="color:red" hidden="true">Username is required.</span>
+        <br>
+        <input id="roomNameField" placeholder="Enter room name"></input>
+        <input id="userNameField" placeholder="Username is required"></input>
+        <button onclick="joinRoom()">Join Room</button>
+      </div>
+      <div id="postJoinControls" hidden="true">
+        <span>Connected to Room:&nbsp;&nbsp;</span>
+        <span id="roomNameOutput"></span>&nbsp;&nbsp;
+        <button onclick="leaveRoom()">Leave</button>
+        <br>
+        <span>Users connected:&nbsp;&nbsp;</span>
+        <span id="usersConnectedOutput"></span>
+      </div>
+    </div>
+  </header>
+  <content>
+    <div class="column fillbox" id="logColumn">
+      <div>
+        <h2>Log</h2>
+        <hr>
+      </div>
+      <div class="fillRemaining bottomOfParent leftInParent">
+        <div class="fillBox fillParent">
+          <div class="fillRemaining" id="questionsAndAnswers"></div>
+          <span id="8characterMin" style="color: red;" hidden="true">Must be at least 8 characters.</span>
+          <div id="logdiv">
+            <input id="questionField" placeholder="Ask your question" disabled="true"></input>
+            <button id="questionEnterButton" onclick="sendQuestion()" disabled="true">Enter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column fillBox" id="controlsColumn">
+      <div>
+        <h2>Controls</h2>
+        <hr>
+      </div>
+      <div class="fillRemaining centerInParent">
+        <div id="controlsAndQuestionDiv">
+          <div id="countdownDiv" hidden="true">
+            <span>Seconds left to answer:</span>
+            <span id="secondsLeft"></span>
+            <br><br>
+          </div>
+          <div id="questionDiv">
+            <span>Current Question:</span>
+            <hr>
+            <span id="currentQuestion">---none---</span>
+            <hr>
+          </div>
+          <div id="answerRecieved" hidden="true">
+            <br>
+            <span style="color: green;">Answer Recieved:</span>
+            <br>
+            <span id="answerOutput"></span>
+            <br>
+          </div>
+          <div id="controlsDiv" hidden="true">
+            <br>
+            <div class="horizontalFillBox" id="openEndedControls">
+              <input class="fillRemaining" id="answerField" placeholder="Custom Answer" disabled="true"></input>
+              &nbsp;&nbsp;
+              <button id="answerEnterButton" onclick="sendAnswer()" disabled="true">Enter</button>
+              <br>
+            </div>
+            <div id="yesNoControls" hidden="true">
+              <br>
+              <button onclick="onExtraButton('Yes')">Yes</button>
+              <button onclick="onExtraButton('No')">No</button>
+              <button onclick="onExtraButton('Coin Flip')">Coin Flip</button>
+              <br>
+            </div>
+            <div id="numericControls" hidden="true">
+              <br>
+              <div style="display: flex; justify-content: space-around;">
+                <button onclick="onExtraButton('Zeronone')">Zero/None</button>
+                <button onclick="onExtraButton('One')">One</button>
+                <button onclick="onExtraButton('Percentile Dice')" title="2d10 where one d10 determines the 10's place">Percentile Dice</button>
+              </div>
+              <br>
+              <span>Between
+                <input style="width: 50px;" type="number" id="minField" placeholder="min" value="1">
+                and
+                <input style="width: 50px;" type="number" id="maxField" placeholder="max" value="10">.
+                <button onclick="onExtraButton('Between')">Enter</button>
+              </span>
+              <br><br>
+              <span>Roll
+                <input style="width: 30px;" type="number" id="numberDiceField" min="1" placeholder="#" value="1">
+                d
+                <input style="width: 30px;" type="number" id="diceTypeField" min="2" placeholder="#" value="6">.
+                <button onclick="onExtraButton('Roll')">Enter</button>
+              </span>
+              <br>
+            </div>
+            <div id="otherControls">
+              <br>
+              <button id="abstainButton" onclick="onExtraButton('Abstain')" disabled="true">Abstain</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </content>
+  <footer>
+    <a onclick="infobox()"><u>Info</u></a>
+    <a href="sunnydan.github.io">Return to Homepage</a>
+  </footer>
+  <div id="sound"></div>
+</body>
+
+</html>
