@@ -1,119 +1,33 @@
 body {
   background: #161616;
-  color: #bdbdbd;
-  font-weight: 300;
-  height: 100vh;
-  margin: 0;
-  font-family: Helvetica neue, roboto;
-}
-
-header {
-  height: 12%;
-}
-
-content {
-  width: 100%;
-  height: 80%;
   display: flex;
-  justify-content: space-around;
-}
-
-footer {
-  height: 8%;
-  display: flex;
+  min-height: 100vh;
   flex-direction: column;
-  align-items: center;
+  /* color: #bdbdbd; */
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+.putInline {
+  display: flex;
   justify-content: center;
 }
 
-h1 {
-  font-weight: 300;
+.beInline {
+  margin-left: auto;
+  margin-right: auto;
 }
 
-a {
-  color: skyblue;
+.whitePlaceholder {
+  color: white;
 }
 
-.centerInParent {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.whitePlaceholder::placeholder {
+  color: white;
 }
 
-.bottomOfParent {
-  display: flex;
-  align-items: flex-end;
-}
-
-.leftInParent {
-  display: flex;
-  justify-content: left;
-}
-
-.column {
-  height: 100%;
-  width: 45%;
-  border: 1px #bdbdbd solid;
-  text-align: center;
-}
-
-.noMarginNoPadding {
-  margin: 0px;
-  padding: 0px;
-}
-
-.fillBox {
-  display: flex;
-  flex-flow: column;
-  height: 100%;
-}
-
-.horizontalFillBox {
-  display: flex;
-  flex-flow: row;
-  width: 100%;
-}
-
-.fillRemaining {
-  flex: 1 1 auto;
-  height: 85%;
-}
-
-.fillParent {
-  width: 100%;
-  height: 100%;
-}
-
-.actuallyBlock {
-  display: block;
-}
-
-.centerText {
-  text-align: center;
-}
-
-#logdiv {
-  display: block;
-  text-align: center;
-  padding-left: 10px;
-  padding-bottom: 15px;
-  width: 100%;
-}
-
-#questionsAndAnswers {
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-}
-
-#questionsAndAnswers p {
-  margin-left: 10px;
-}
-
-#controlsAndQuestionDiv {
-  display: block;
-  margin-bottom: 5%;
+ul, li {
+  list-style-type: circle !important;
 }

@@ -110,26 +110,16 @@ function isYesOrNoQuestion(questionText) {
 }
 
 function joinRoom() {
-  var validJoin = true;
   if (document.getElementById("userNameField").value == "") {
-    document.getElementById("userNameField").classList.add("invalid");
-    validJoin = false;
-  }
-  if (document.getElementById("roomNameField").value == "") {
-    document.getElementById("roomNameField").classList.add("invalid");
-    validJoin = false;
-  }
-  if (validJoin) {
-    document.getElementById("roomNameField").classList.remove("invalid");
-    document.getElementById("userNameField").classList.remove("invalid");
-
+    document.getElementById("usernameIsRequired").hidden = false;
+  } else {
     drone = new ScaleDrone(channel_id, {
       data: {
         username: document.getElementById("userNameField").value,
       }
     });
-
     username = document.getElementById("userNameField").value;
+    document.getElementById("usernameIsRequired").hidden = true;
     room = drone.subscribe("observable-" + document.getElementById("roomNameField").value);
     roomname = document.getElementById("roomNameField").value;
     room.on('members', function(members) {
@@ -152,8 +142,8 @@ function joinRoom() {
           member => member.clientData.username != leavingMember.clientData.username);
         updateMembers();
       });
-      document.getElementById("usersConnectedRow").hidden = false;
-      document.getElementById("usersConnectedRow").style.removeProperty('display');
+      document.getElementById("preJoinControls").hidden = true;
+      document.getElementById("postJoinControls").hidden = false;
       document.getElementById("roomNameOutput").textContent = "\"" + roomname + "\"";
       mode = "question";
       onNewMode();
@@ -162,16 +152,17 @@ function joinRoom() {
 }
 
 function leaveRoom() {
-  location.reload();
-  // room.unsubscribe();
-  // drone.close();
-  // drone = null;
-  // room = null;
-  // username = null;
-  // document.getElementById("questionsAndAnswers").innerHTML = "";
-  // document.getElementById("roomNameField").value = ""
-  // mode = "notConnected";
-  // onNewMode();
+  room.unsubscribe();
+  drone.close();
+  drone = null;
+  room = null;
+  username = null;
+  mode = "notConnected";
+  document.getElementById("questionsAndAnswers").innerHTML = "";
+  document.getElementById("preJoinControls").hidden = false;
+  document.getElementById("postJoinControls").hidden = true;
+  document.getElementById("roomNameField").value = ""
+  onNewMode();
 }
 
 function onAnswer(data) {
@@ -200,26 +191,14 @@ function onAnswer(data) {
 function onCountdown(data) {
   if (mode != "question") {
     countdownStarted = true;
-    var countdowns = document.getElementsByClassName("countdownSpan");
-    var secondsLefts = document.getElementsByClassName("secondsLeft");
-    for (var i = 0; i < countdowns.length; i++) {
-      countdowns[i].hidden = false;
-    }
-    for (var i = 0; i < secondsLefts.length; i++) {
-      secondsLefts[i].textContent = data.messageText;
-    }
+    document.getElementById("countdownDiv").hidden = false;
+    document.getElementById("secondsLeft").textContent = data.messageText;
     if (data.messageText >= 20)
-      for (var i = 0; i < secondsLefts.length; i++) {
-        secondsLefts[i].style.color = "yellow";
-      }
+      document.getElementById("secondsLeft").style.color = "green";
     if (data.messageText == 10)
-      for (var i = 0; i < secondsLefts.length; i++) {
-        secondsLefts[i].style.color = "orange";
-      }
+      document.getElementById("secondsLeft").style.color = "yellow";
     if (data.messageText <= 5)
-      for (var i = 0; i < secondsLefts.length; i++) {
-        secondsLefts[i].style.color = "red";
-      }
+      document.getElementById("secondsLeft").style.color = "red";
     if (iAmTheServer()) {
       switch (data.messageText) {
         case 30:
@@ -365,32 +344,35 @@ function onMessage(message) {
 
 function onNewMode() {
   if (mode == "question") {
-    scaleOutCardByID("logInCard");
-    scaleOutCardByID("answerCard");
-    scaleOutCardByID("givenAnswerCard");
-    scaleInCardByID("logCard");
-    scaleInCardByID("questionCard");
-    document.getElementById("yesNoControls").hidden = true;
-    document.getElementById("numericControls").hidden = true;
-    document.getElementById("answerField").placeholder = "Custom Answer";
+    disableAnswerControls();
     countdownStarted = false;
-    var countdowns = document.getElementsByClassName("countdownSpan");
-    for (var i = 0; i < countdowns.length; i++) {
-      countdowns[i].hidden = true;
-    }
+    document.getElementById("logColumn").style.border = "1px green solid";
+    document.getElementById("countdownDiv").hidden = true;
+    document.getElementById("answerRecieved").hidden = true;
+    document.getElementById("answerOutput").textContent = "";
+    document.getElementById("questionField").disabled = false;
+    document.getElementById("questionEnterButton").disabled = false;
     document.getElementById("questionField").focus();
     answers = [];
     abstains = 0;
   } else if (mode == "answer") {
     ding();
-    scaleOutCardByID("logCard");
-    scaleOutCardByID("questionCard");
-    scaleInCardByID("answerCard");
+    disableQuestionControls();
+    document.getElementById("8characterMin").hidden = true;
+    document.getElementById("controlsColumn").style.border = "1px green solid";
+    document.getElementById("controlsDiv").hidden = false;
+    document.getElementById("answerField").disabled = false;
+    document.getElementById("answerEnterButton").disabled = false;
+    document.getElementById("abstainButton").disabled = false;
     document.getElementById("answerField").focus();
   } else if (mode == "noQuestion") {
-    scaleOutCardByID("answerCard");
-    scaleInCardByID("givenAnswerCard");
-  } else {}
+    document.getElementById("answerRecieved").hidden = false;
+    disableAnswerControls();
+    disableQuestionControls();
+  } else {
+    disableAnswerControls();
+    disableQuestionControls();
+  }
 }
 
 function onQuestion(message) {
@@ -409,7 +391,6 @@ function onQuestion(message) {
   document.getElementById("currentQuestion").textContent = questionText;
 
   if (isYesOrNoQuestion(questionText)) {
-    console.log("make yesno vis");
     document.getElementById("yesNoControls").hidden = false;
   } else if (isNumericQuestion(questionText)) {
     document.getElementById("answerField").placeholder = "Custom Answer/Value";
@@ -421,37 +402,6 @@ function onQuestion(message) {
 
   mode = "answer";
   onNewMode();
-}
-
-function randomIntFromInterval(min, max) { // min and max included
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function scaleInCardByID(cardID) {
-  var card = document.getElementById(cardID);
-  card.hidden = false;
-  setTimeout(() => {
-    card.classList.remove("scale-out");
-    card.classList.add("scale-in");
-  }, 200);
-}
-
-function scaleOutCardByID(cardID) {
-  var card = document.getElementById(cardID);
-  card.classList.remove("scale-in");
-  card.classList.add("scale-out");
-  setTimeout(() => {
-    card.hidden = true;
-  }, 200);
-}
-
-function scaleToggleCardByID(cardID) {
-  var card = document.getElementById(cardID);
-  if (card.hidden != true) { //if the card is showing
-    scaleOutCardByID(card.id);
-  } else { //if the card is not showing, ergo: if hidden is true
-    scaleInCardByID(card.id);
-  }
 }
 
 function sendAnswer() {
@@ -496,7 +446,6 @@ function sendFinalAnswer(text) {
 function sendQuestion() {
   questionText = document.getElementById("questionField").value;
   if (questionText.length >= 8) {
-    document.getElementById("questionField").classList.remove("invalid");
     if (questionText.charAt(questionText.length - 1) != '?') {
       questionText = questionText.concat("?");
     }
@@ -510,16 +459,15 @@ function sendQuestion() {
     });
     document.getElementById("questionField").value = "";
   } else {
-    document.getElementById("questionField").classList.add("invalid");
+    document.getElementById("8characterMin").hidden = false;
   }
 }
 
+function randomIntFromInterval(min, max) { // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 function updateMembers() {
-  if (membersArray.length > 0) {
-    document.getElementById("usersConnectedRow").hidden = false;
-  } else {
-    document.getElementById("usersConnectedOutput").hidden = true;
-  }
   document.getElementById("usersConnectedOutput").innerHTML = "";
   var name = membersArray[0].clientData.username;
   var textnode = document.createTextNode(name);
@@ -532,11 +480,3 @@ function updateMembers() {
     }
   }
 }
-
-document.getElementById("logCard").hidden = true;
-document.getElementById("questionCard").hidden = true;
-document.getElementById("answerCard").hidden = true;
-document.getElementById("yesNoControls").hidden = true;
-document.getElementById("numericControls").hidden = true;
-document.getElementById("usersConnectedRow").hidden = true;
-document.getElementById("usersConnectedRow").style.display = "none !important";

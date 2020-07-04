@@ -3,127 +3,140 @@
 <head>
   <title>The Hivemind GM Emulator</title>
   <link rel="icon" href="https://sunnydan.github.io/resources/favicon.ico">
-  <link rel="stylesheet" type="text/css" href="resources/hivemind.css">
-  <script src='https://cdn.scaledrone.com/scaledrone.min.js'></script>
-  <script src="resources/hivemind.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="resources/materialize/css/materialize.min.css" media="screen,projection" />
+  <link type="text/css" rel="stylesheet" href="resources/hivemind.css" />
+  <!--Let browser know website is optimized for mobile-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
 <body>
-  <header class="centerInParent">
-    <div class="actuallyBlock centerText">
-      <h1 class="noMarginNoPadding" id="programtitle">The Hivemind GM Emulator v1.0</h1>
-      <div id="preJoinControls">
-        <span id="notConnected">Not currently connected to any room.</span>
-        <span id="usernameIsRequired" style="color:red" hidden="true">Username is required.</span>
-        <br>
-        <input id="roomNameField" placeholder="Enter room name"></input>
-        <input id="userNameField" placeholder="Username is required"></input>
-        <button onclick="joinRoom()">Join Room</button>
-      </div>
-      <div id="postJoinControls" hidden="true">
-        <span>Connected to Room:&nbsp;&nbsp;</span>
-        <span id="roomNameOutput"></span>&nbsp;&nbsp;
-        <button onclick="leaveRoom()">Leave</button>
-        <br>
-        <span>Users connected:&nbsp;&nbsp;</span>
-        <span id="usersConnectedOutput"></span>
-      </div>
+  <nav>
+    <div class="nav-wrapper grey darken-4">
+      <span class="brand-logo center hide-on-small-only">The Hivemind GM Emulator v1.5</span>
+      <span class="brand-logo center hide-on-med-and-up">HGME v1.5</span>
     </div>
-  </header>
-  <content>
-    <div class="column fillbox" id="logColumn">
-      <div>
-        <h2>Log</h2>
-        <hr>
-      </div>
-      <div class="fillRemaining bottomOfParent leftInParent">
-        <div class="fillBox fillParent">
-          <div class="fillRemaining" id="questionsAndAnswers"></div>
-          <span id="8characterMin" style="color: red;" hidden="true">Must be at least 8 characters.</span>
-          <div id="logdiv">
-            <input id="questionField" placeholder="Ask your question" disabled="true"></input>
-            <button id="questionEnterButton" onclick="sendQuestion()" disabled="true">Enter</button>
+  </nav>
+  <main>
+    <div class="container">
+      <div class="row center">
+        <div class="card teal darken-4 scale-transition" id="logInCard">
+          <div class="card-content white-text">
+            <span class="card-title">Room Setup</span>
+            <p class="white-text">Not currently connected to any room. You must connect to a room to use the GM emulator.</p>
+            <div class="input-field">
+              <input class="whitePlaceholder validate" placeholder="Enter Room Name" type="text" id="roomNameField"></input>
+              <span class="helper-text" data-error="Room Name Required"></span>
+            </div>
+            <div class="input-field">
+              <input class="whitePlaceholder validate" placeholder="Username Required" type="text" data-error="wrong" maxlength="20" id="userNameField"></input>
+              <span class="helper-text" data-error="Username Required"></span>
+            </div>
+          </div>
+          <div class="card-action center putInline">
+            <a onclick="joinRoom()" class="btn-small grey darken-3 beInline activator">Join/Create Room</a>
+          </div>
+          <!-- <div class="card-reveal yellow darken-3">
+            <p class="white-text">This room is password protected. Enter the password</p>
+            <input class="whitePlaceholder" placeholder="Password Required" type="text" id="passwordField"></input>
+            <a class="btn-small grey darken-3">Join Room</a>
+          </div> -->
+        </div>
+        <div class="card green darken-4 scale-transition scale-out" id="logCard">
+          <div class="card-content white-text">
+            <span class="card-title">Room <span id="roomNameOutput"></span> Log</span>
+            <div style="text-align: left;" id="questionsAndAnswers"></div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="column fillBox" id="controlsColumn">
-      <div>
-        <h2>Controls</h2>
-        <hr>
-      </div>
-      <div class="fillRemaining centerInParent">
-        <div id="controlsAndQuestionDiv">
-          <div id="countdownDiv" hidden="true">
-            <span>Seconds left to answer:</span>
-            <span id="secondsLeft"></span>
-            <br><br>
+        <div class="card deep-purple darken-4 scale-transition scale-out" id="questionCard">
+          <div class="card-content white-text">
+            <div class="input-field">
+              <input class="whitePlaceholder validate" placeholder="Ask your question" type="text" minlength="8" id="questionField"></input>
+              <span class="helper-text" data-error="Question must be at least 8 characters"></span>
+            </div>
           </div>
-          <div id="questionDiv">
-            <span>Current Question:</span>
-            <hr>
-            <span id="currentQuestion">---none---</span>
-            <hr>
+          <div class="card-action center">
+            <a onclick="sendQuestion()" class="btn-small grey darken-3">Ask Question</a>
           </div>
-          <div id="answerRecieved" hidden="true">
-            <br>
-            <span style="color: green;">Answer Recieved:</span>
-            <br>
-            <span id="answerOutput"></span>
-            <br>
-          </div>
-          <div id="controlsDiv" hidden="true">
-            <br>
-            <div class="horizontalFillBox" id="openEndedControls">
-              <input class="fillRemaining" id="answerField" placeholder="Custom Answer" disabled="true"></input>
-              &nbsp;&nbsp;
-              <button id="answerEnterButton" onclick="sendAnswer()" disabled="true">Enter</button>
-              <br>
+        </div>
+        <div class="card cyan darken-4 scale-transition scale-out" id="answerCard">
+          <div class="card-content white-text">
+            <span class="card-title" id="currentQuestion"></span>
+            <span class="white-text countdownSpan">Seconds left to answer:&nbsp;<span class="secondsLeft"></span></span>
+            <div class="input-field putInline">
+              <input class="whitePlaceholder beInline" placeholder="Custom Answer" type="text" id="answerField"></input>&nbsp;&nbsp;
+              <a onclick="sendAnswer()" class="btn-small green darken-3 beInline">Answer</a>
             </div>
             <div id="yesNoControls" hidden="true">
-              <br>
-              <button onclick="onExtraButton('Yes')">Yes</button>
-              <button onclick="onExtraButton('No')">No</button>
-              <button onclick="onExtraButton('Coin Flip')">Coin Flip</button>
-              <br>
+              <div class="row putInline">
+                <a onclick="onExtraButton('Yes')" class="btn-small green darken-3 beInline">Yes</a>
+                <a onclick="onExtraButton('No')" class="btn-small green darken-3 beInline">No</a>
+                <a onclick="onExtraButton('Coin Flip')" class="btn-small green darken-3 beInline">Coin Flip</a>
+              </div>
             </div>
             <div id="numericControls" hidden="true">
-              <br>
-              <div style="display: flex; justify-content: space-around;">
-                <button onclick="onExtraButton('Zeronone')">Zero/None</button>
-                <button onclick="onExtraButton('One')">One</button>
-                <button onclick="onExtraButton('Percentile Dice')" title="2d10 where one d10 determines the 10's place">Percentile Dice</button>
+              <div class="row putInline">
+                <a onclick="onExtraButton('Zeronone')" class="btn-small green darken-3 beInline">Zero/None</a>
+                <a onclick="onExtraButton('One')" class="btn-small green darken-3 beInline">One</a>
+                <a onclick="onExtraButton('Percentile Dice')" title="2d10 where one d10 determines the 10's place" class="btn-small green darken-3 beInline">Percentile Dice</a>
               </div>
-              <br>
-              <span>Between
-                <input style="width: 50px;" type="number" id="minField" placeholder="min" value="1">
-                and
-                <input style="width: 50px;" type="number" id="maxField" placeholder="max" value="10">.
-                <button onclick="onExtraButton('Between')">Enter</button>
-              </span>
-              <br><br>
-              <span>Roll
-                <input style="width: 30px;" type="number" id="numberDiceField" min="1" placeholder="#" value="1">
-                d
-                <input style="width: 30px;" type="number" id="diceTypeField" min="2" placeholder="#" value="6">.
-                <button onclick="onExtraButton('Roll')">Enter</button>
-              </span>
-              <br>
+              <div class="row putInline">
+                <br>
+                <span>Between
+                  <input class="white-text" style="width: 50px;" type="number" id="minField" placeholder="min" value="1">
+                  and
+                  <input class="white-text" style="width: 50px;" type="number" id="maxField" placeholder="max" value="10">.
+                  &nbsp;&nbsp;
+                  <a onclick="onExtraButton('Between')" class="btn-small green darken-3 beInline">Enter</a>
+                </span>
+              </div>
+              <div class="row putInline">
+                <span>Roll
+                  <input class="white-text" style="width: 30px;" type="number" id="numberDiceField" min="1" placeholder="#" value="1">
+                  d
+                  <input class="white-text" style="width: 30px;" type="number" id="diceTypeField" min="2" placeholder="#" value="6">.
+                  &nbsp;&nbsp;
+                  <a onclick="onExtraButton('Roll')" class="btn-small green darken-3 beInline">Enter</a>
+                </span>
+              </div>
             </div>
-            <div id="otherControls">
-              <br>
-              <button id="abstainButton" onclick="onExtraButton('Abstain')" disabled="true">Abstain</button>
-            </div>
+          </div>
+          <div class="card-action center putInline">
+            <a onclick="onExtraButton('Abstain')" class="btn-small red darken-3 beInline">Abstain</a>
+          </div>
+        </div>
+        <div class="card cyan darken-4 scale-transition scale-out" id="givenAnswerCard">
+          <div class="card-content white-text">
+            <span class="card-title white-text">Answer Received</span>
+            <p class="white-text">You said: "<span id="answerOutput"></span>"</p>
+            <span class="white-text countdownSpan">Seconds left to answer:&nbsp;<span class="secondsLeft"></span></span>
           </div>
         </div>
       </div>
     </div>
-  </content>
-  <footer>
-    <a href="info.html">Info</a>
-    <a href="/..">Return to Homepage</a>
+  </main>
+  <footer class="page-footer grey darken-4">
+    <div class="container">
+      <div hidden id="usersConnectedRow">
+        <div class="row putInline">
+          <span class="beInline">Connected Users: <span id="usersConnectedOutput"></span></span>
+          <a onclick="leaveRoom()" class="btn-small red darken-4 beInline hide-on-small-only">Leave Room</a>
+        </div>
+        <div class="row putInline hide-on-med-and-up">
+          <a onclick="leaveRoom()" class="btn-small red darken-4 beInline">Leave Room</a>
+        </div>
+      </div>
+      <div class="row putInline">
+        <a href="info.html" class="btn-small grey darken-3 beInline">Info</a>
+        <a href="/.." class="btn-small grey darken-3 beInline">Return to Homepage</a>
+      </div>
+    </div>
   </footer>
   <div id="sound"></div>
+  <!--JavaScript at end of body for optimized loading-->
+  <script src='https://cdn.scaledrone.com/scaledrone.min.js'></script>
+  <script type="text/javascript" src="resources/materialize/js/materialize.min.js"></script>
+  <script src="resources/hivemind.js"></script>
 </body>
 
 </html>
