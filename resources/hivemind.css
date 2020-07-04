@@ -31,3 +31,8 @@ main {
 ul, li {
   list-style-type: circle !important;
 }
+
+#questionsAndAnswers {
+  max-height: 50vh;
+  overflow-y: scroll;
+}

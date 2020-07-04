@@ -336,9 +336,6 @@ function onFinalAnswer(data) {
 
   document.getElementById("currentQuestion").textContent = "---none---";
 
-  var elem = document.getElementById('questionsAndAnswers');
-  elem.scrollTop = elem.scrollHeight;
-
   mode = "question";
   onNewMode();
 }
@@ -364,22 +361,30 @@ function onMessage(message) {
 }
 
 function onNewMode() {
-  window.scrollTo(0, 0);
   if (mode == "question") {
     scaleOutCardByID("logInCard");
     scaleOutCardByID("answerCard");
     scaleOutCardByID("givenAnswerCard");
     scaleInCardByID("logCard");
     scaleInCardByID("questionCard");
-    document.getElementById("yesNoControls").hidden = true;
-    document.getElementById("numericControls").hidden = true;
-    document.getElementById("answerField").placeholder = "Custom Answer";
+
     countdownStarted = false;
     var countdowns = document.getElementsByClassName("countdownSpan");
     for (var i = 0; i < countdowns.length; i++) {
       countdowns[i].hidden = true;
     }
+
+    document.getElementById("yesNoControls").hidden = true;
+    document.getElementById("numericControls").hidden = true;
+    document.getElementById("answerField").placeholder = "Custom Answer";
     document.getElementById("questionField").focus();
+
+    var top = document.getElementById('questionField').documentOffsetTop() - (window.innerHeight / 2);
+    window.scrollTo(0, top);
+
+    var elem = document.getElementById('questionsAndAnswers');
+    elem.scrollTop = elem.scrollHeight;
+
     answers = [];
     abstains = 0;
   } else if (mode == "answer") {
@@ -388,6 +393,7 @@ function onNewMode() {
     scaleOutCardByID("questionCard");
     scaleInCardByID("answerCard");
     document.getElementById("answerField").focus();
+    window.scrollTo(0, 0);
   } else if (mode == "noQuestion") {
     scaleOutCardByID("answerCard");
     scaleInCardByID("givenAnswerCard");
@@ -541,3 +547,7 @@ document.getElementById("yesNoControls").hidden = true;
 document.getElementById("numericControls").hidden = true;
 document.getElementById("usersConnectedRow").hidden = true;
 document.getElementById("usersConnectedRow").style.display = "none !important";
+
+Element.prototype.documentOffsetTop = function() {
+  return this.offsetTop + (this.offsetParent ? this.offsetParent.documentOffsetTop() : 0);
+};
