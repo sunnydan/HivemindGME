@@ -364,6 +364,7 @@ function onMessage(message) {
 }
 
 function onNewMode() {
+  window.scrollTo(0, 0);
   if (mode == "question") {
     scaleOutCardByID("logInCard");
     scaleOutCardByID("answerCard");
