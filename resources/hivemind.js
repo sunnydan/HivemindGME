@@ -343,17 +343,20 @@ function onFinalAnswer(data) {
 function onMessage(message) {
   var data = message.data;
   switch (data.type) {
-    case "question":
-      onQuestion(message);
-      break;
     case "answer":
       onAnswer(data);
+      break;
+    case "countdown":
+      onCountdown(data);
       break;
     case "finalAnswer":
       onFinalAnswer(data);
       break;
-    case "countdown":
-      onCountdown(data);
+    case "question":
+      onQuestion(message);
+      break;
+    case "statement":
+      onStatement(data);
       break;
     default:
       alert("Something broke! Recieved message without type!");
@@ -428,6 +431,18 @@ function onQuestion(message) {
 
   mode = "answer";
   onNewMode();
+}
+
+function onStatement(data) {
+  console.log(data.messageText);
+  var Pnode = document.createElement("P");
+  var Strongnode = document.createElement("Strong");
+  var textnode = document.createTextNode("Statement:\xa0\xa0");
+  Strongnode.appendChild(textnode);
+  Pnode.appendChild(Strongnode);
+  var textnode = document.createTextNode(data.messageText);
+  Pnode.appendChild(textnode);
+  document.getElementById("questionsAndAnswers").appendChild(Pnode);
 }
 
 function randomIntFromInterval(min, max) { // min and max included
@@ -510,6 +525,28 @@ function sendQuestion() {
     var message = {
       type: "question",
       messageText: questionText
+    };
+    drone.publish({
+      room: room.name,
+      message: message
+    });
+    document.getElementById("questionField").value = "";
+  } else {
+    document.getElementById("questionField").classList.add("invalid");
+  }
+}
+
+function sendStatement() {
+  statementText = document.getElementById("questionField").value;
+  if (statementText.length >= 8) {
+    document.getElementById("questionField").classList.remove("invalid");
+    lastchar = statementText.charAt(statementText.length - 1);
+    if (lastchar != '.' && lastchar != '!') {
+      statementText = statementText.concat(".");
+    }
+    var message = {
+      type: "statement",
+      messageText: statementText
     };
     drone.publish({
       room: room.name,
