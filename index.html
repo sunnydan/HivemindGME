@@ -58,7 +58,7 @@
           <div class="card-action center">
             <div class="row putInline">
               <a onclick="sendQuestion()" class="btn-small grey darken-3 beInline">Ask Question</a>
-              <span class="beInline" id="makeStatementButtonDiv">
+              <span class="beInline" id="makeStatementButtonSpan">
                 <a onclick="sendStatement()" class="btn-small grey darken-3">Make Statement</a>
               </span>
             </div>
@@ -122,7 +122,7 @@
             <span class="card-title white-text">Settings</span>
             <p>
               <label>
-                <input type="checkbox" onclick="updateMakeStatements()" id="playersCanMakeStatementsCheckbox"/>
+                <input type="checkbox" onclick="updateMakeStatements()" id="playersCanMakeStatementsCheckbox" />
                 <span>Allow players to make statements?</span>
               </label>
             </p>
@@ -140,12 +140,16 @@
         <div class="row putInline">
           <span class="beInline">Connected Users: <span id="usersConnectedOutput"></span></span>
           <div class="beInline hide-on-small-only">
-            <a onclick="showSettings()" class="btn-small grey darken-3">Settings</a>
+            <span class="settingsButtonSpans">
+              <a onclick="scaleToggleCardByID('settingsCard')" class="btn-small grey darken-3">Settings</a>
+            </span>
             <a onclick="leaveRoom()" class="btn-small red darken-4">Leave Room</a>
           </div>
         </div>
         <div class="row putInline hide-on-med-and-up">
-          <a onclick="showSettings()" class="btn-small grey darken-3 beInline" id="settingsButton">Settings</a>
+          <span class="settingsButtonSpans">
+            <a onclick="scaleToggleCardByID('settingsCard')" class="btn-small grey darken-3 beInline">Settings</a>
+          </span>
           <a onclick="leaveRoom()" class="btn-small red darken-4 beInline">Leave Room</a>
         </div>
       </div>

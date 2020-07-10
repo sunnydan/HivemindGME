@@ -9,6 +9,7 @@ var answers = [];
 var abstains = 0;
 var countdownStarted = false;
 var playersCanMakeStatements = false;
+var settingsButtons;
 
 document.addEventListener('keyup', (e) => {
   if (e.code === "Enter") {
@@ -373,9 +374,13 @@ function onMessage(message) {
 
 function onNewMode() {
   if (iAmTheServer()) {
-    document.getElementById("settingsButton").hidden = false;
+    for (var i = 0; i < settingsButtons.length; i++) {
+      settingsButtons[i].hidden = false;
+    }
   } else {
-    document.getElementById("settingsButton").hidden = true;
+    for (var i = 0; i < settingsButtons.length; i++) {
+      settingsButtons[i].hidden = true;
+    }
   }
   if (mode == "question") {
     scaleOutCardByID("logInCard");
@@ -452,7 +457,7 @@ function onSettingsUpdate(data) {
   switch (setting) {
     case "playersCanMakeStatements":
       playersCanMakeStatements = newValue;
-      document.getElementById("makeStatementButtonDiv").hidden = !playersCanMakeStatements;
+      document.getElementById("makeStatementButtonSpan").hidden = !playersCanMakeStatements;
       break;
     default:
       //donothing
@@ -596,12 +601,6 @@ function sendStatement() {
   }
 }
 
-function showSettings() {
-  scaleInCardByID("settingsCard");
-}
-
-//TOGGLE FUNCTIONS BAD!!!!!
-
 function updateMakeStatements() {
   sendSettingsUpdate("playersCanMakeStatements", document.getElementById("playersCanMakeStatementsCheckbox").checked);
 }
@@ -633,9 +632,12 @@ document.getElementById("settingsCard").hidden = true;
 document.getElementById("yesNoControls").hidden = true;
 document.getElementById("numericControls").hidden = true;
 document.getElementById("usersConnectedRow").hidden = true;
-document.getElementById("settingsButton").hidden = true;
-document.getElementById("makeStatementButtonDiv").hidden = true;
+document.getElementById("makeStatementButtonSpan").hidden = true;
 document.getElementById("usersConnectedRow").style.display = "none !important";
+settingsButtons = document.getElementsByClassName("settingsButtonSpans");
+for (var i = 0; i < settingsButtons.length; i++) {
+  settingsButtons[i].hidden = true;
+}
 
 Element.prototype.documentOffsetTop = function() {
   return this.offsetTop + (this.offsetParent ? this.offsetParent.documentOffsetTop() : 0);
