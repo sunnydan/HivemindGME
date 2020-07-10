@@ -58,7 +58,9 @@
           <div class="card-action center">
             <div class="row putInline">
               <a onclick="sendQuestion()" class="btn-small grey darken-3 beInline">Ask Question</a>
-              <a onclick="sendStatement()" class="btn-small grey darken-3 beInline">Make Statement</a>
+              <span class="beInline" id="makeStatementButtonDiv">
+                <a onclick="sendStatement()" class="btn-small grey darken-3">Make Statement</a>
+              </span>
             </div>
           </div>
         </div>
@@ -115,6 +117,20 @@
             <span class="white-text countdownSpan">Seconds left to answer:&nbsp;<span class="secondsLeft"></span></span>
           </div>
         </div>
+        <div class="card indigo darken-4 scale-transition scale-out" id="settingsCard">
+          <div class="card-content white-text">
+            <span class="card-title white-text">Settings</span>
+            <p>
+              <label>
+                <input type="checkbox" onclick="updateMakeStatements()" id="playersCanMakeStatementsCheckbox"/>
+                <span>Allow players to make statements?</span>
+              </label>
+            </p>
+          </div>
+          <div class="card-action center">
+            <a onclick="hideAndApplySettings()" class="btn-small grey darken-3">Done</a>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -123,9 +139,13 @@
       <div hidden id="usersConnectedRow">
         <div class="row putInline">
           <span class="beInline">Connected Users: <span id="usersConnectedOutput"></span></span>
-          <a onclick="leaveRoom()" class="btn-small red darken-4 beInline hide-on-small-only">Leave Room</a>
+          <div class="beInline hide-on-small-only">
+            <a onclick="showSettings()" class="btn-small grey darken-3">Settings</a>
+            <a onclick="leaveRoom()" class="btn-small red darken-4">Leave Room</a>
+          </div>
         </div>
         <div class="row putInline hide-on-med-and-up">
+          <a onclick="showSettings()" class="btn-small grey darken-3 beInline" id="settingsButton">Settings</a>
           <a onclick="leaveRoom()" class="btn-small red darken-4 beInline">Leave Room</a>
         </div>
       </div>

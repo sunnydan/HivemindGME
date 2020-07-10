@@ -8,6 +8,7 @@ var mode = "notConnected";
 var answers = [];
 var abstains = 0;
 var countdownStarted = false;
+var playersCanMakeStatements = false;
 
 document.addEventListener('keyup', (e) => {
   if (e.code === "Enter") {
@@ -172,6 +173,10 @@ function leaveRoom() {
   // document.getElementById("roomNameField").value = ""
   // mode = "notConnected";
   // onNewMode();
+}
+
+function hideAndApplySettings() {
+  scaleOutCardByID("settingsCard");
 }
 
 function onAnswer(data) {
@@ -355,6 +360,9 @@ function onMessage(message) {
     case "question":
       onQuestion(message);
       break;
+    case "settingsUpdate":
+      onSettingsUpdate(data);
+      break;
     case "statement":
       onStatement(data);
       break;
@@ -364,6 +372,11 @@ function onMessage(message) {
 }
 
 function onNewMode() {
+  if (iAmTheServer()) {
+    document.getElementById("settingsButton").hidden = false;
+  } else {
+    document.getElementById("settingsButton").hidden = true;
+  }
   if (mode == "question") {
     scaleOutCardByID("logInCard");
     scaleOutCardByID("answerCard");
@@ -431,6 +444,19 @@ function onQuestion(message) {
 
   mode = "answer";
   onNewMode();
+}
+
+function onSettingsUpdate(data) {
+  var setting = data.setting;
+  var newValue = data.newValue;
+  switch (setting) {
+    case "playersCanMakeStatements":
+      playersCanMakeStatements = newValue;
+      document.getElementById("makeStatementButtonDiv").hidden = !playersCanMakeStatements;
+      break;
+    default:
+      //donothing
+  }
 }
 
 function onStatement(data) {
@@ -536,6 +562,18 @@ function sendQuestion() {
   }
 }
 
+function sendSettingsUpdate(settingName, newValue) {
+  var message = {
+    type: "settingsUpdate",
+    setting: settingName,
+    newValue: newValue,
+  };
+  drone.publish({
+    room: room.name,
+    message: message
+  });
+}
+
 function sendStatement() {
   statementText = document.getElementById("questionField").value;
   if (statementText.length >= 8) {
@@ -558,6 +596,16 @@ function sendStatement() {
   }
 }
 
+function showSettings() {
+  scaleInCardByID("settingsCard");
+}
+
+//TOGGLE FUNCTIONS BAD!!!!!
+
+function updateMakeStatements() {
+  sendSettingsUpdate("playersCanMakeStatements", document.getElementById("playersCanMakeStatementsCheckbox").checked);
+}
+
 function updateMembers() {
   if (membersArray.length > 0) {
     document.getElementById("usersConnectedRow").hidden = false;
@@ -577,12 +625,16 @@ function updateMembers() {
   }
 }
 
+document.getElementById("answerCard").hidden = true;
+document.getElementById("givenAnswerCard").hidden = true;
 document.getElementById("logCard").hidden = true;
 document.getElementById("questionCard").hidden = true;
-document.getElementById("answerCard").hidden = true;
+document.getElementById("settingsCard").hidden = true;
 document.getElementById("yesNoControls").hidden = true;
 document.getElementById("numericControls").hidden = true;
 document.getElementById("usersConnectedRow").hidden = true;
+document.getElementById("settingsButton").hidden = true;
+document.getElementById("makeStatementButtonDiv").hidden = true;
 document.getElementById("usersConnectedRow").style.display = "none !important";
 
 Element.prototype.documentOffsetTop = function() {
