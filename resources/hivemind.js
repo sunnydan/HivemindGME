@@ -10,6 +10,8 @@ var abstains = 0;
 var countdownStarted = false;
 var playersCanMakeStatements = false;
 var settingsButtons;
+var somethingUnexpectedCanHappen = true;
+var percentChanceOfSomethingUnexpected = 3;
 
 document.addEventListener('keyup', (e) => { //There are a lot of problems that can be caused here if Enter is pushed at the wrong times. Fix.
   if (e.code === "Enter") {
@@ -208,6 +210,17 @@ function onAnswer(data) {
   }
 }
 
+function onChangeOfChanceOfSomethingUnexpectedField() {
+  var currentValue = document.getElementById("percentChanceOfSomethingUnexpectedField").value;
+  if (currentValue != percentChanceOfSomethingUnexpected) {
+    document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "white";
+    document.getElementById("confirmChanceButtonDiv").hidden = false;
+  } else {
+    document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
+    document.getElementById("confirmChanceButtonDiv").hidden = true;
+  }
+}
+
 function onCountdown(data) {
   if (mode != "question") {
     countdownStarted = true;
@@ -349,6 +362,13 @@ function onFinalAnswer(data) {
 
   mode = "question";
   onNewMode();
+
+  if (somethingUnexpectedCanHappen && iAmTheServer()) {
+    var pick = randomIntFromInterval(1, 100);
+    if (pick <= percentChanceOfSomethingUnexpected) {
+      sendSomethingUnexpected();
+    }
+  }
 }
 
 function onMessage(message) {
@@ -371,6 +391,9 @@ function onMessage(message) {
       break;
     case "statement":
       onStatement(data);
+      break;
+    case "somethingUnexpected":
+      onSomethingUnexpected();
       break;
     default:
       alert("Something broke! Recieved message without type!");
@@ -442,7 +465,6 @@ function onQuestion(message) {
   document.getElementById("currentQuestion").textContent = questionText;
 
   if (isYesOrNoQuestion(questionText)) {
-    console.log("make yesno vis");
     document.getElementById("yesNoControls").hidden = false;
   } else if (isNumericQuestion(questionText)) {
     document.getElementById("answerField").placeholder = "Custom Answer/Value";
@@ -471,13 +493,33 @@ function onSettingsUpdate(data) {
         document.getElementById("questionField").placeholder = "Ask your question";
       }
       break;
+    case "somethingUnexpectedCanHappen":
+      somethingUnexpectedCanHappen = newValue;
+      document.getElementById("somethingUnexpectedCanHappenCheckbox").checked = somethingUnexpectedCanHappen;
+      document.getElementById("percentChanceOfSomethingUnexpectedDiv").hidden = !somethingUnexpectedCanHappen;
+      break;
+    case "percentChanceOfSomethingUnexpected":
+      percentChanceOfSomethingUnexpected = newValue;
+      document.getElementById("percentChanceOfSomethingUnexpectedField").value = percentChanceOfSomethingUnexpected;
+      document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
+      document.getElementById("confirmChanceButtonDiv").hidden = true;
+      break;
     default:
       //donothing
   }
 }
 
+function onSomethingUnexpected() {
+  var Pnode = document.createElement("P");
+  var Strongnode = document.createElement("Strong");
+  var textnode = document.createTextNode("Something unexpected happens!");
+  Strongnode.appendChild(textnode);
+  Pnode.appendChild(Strongnode);
+  Pnode.style.color = "yellow";
+  document.getElementById("questionsAndAnswers").appendChild(Pnode);
+}
+
 function onStatement(data) {
-  console.log(data.messageText);
   var Pnode = document.createElement("P");
   var Strongnode = document.createElement("Strong");
   var textnode = document.createTextNode("Statement:\xa0\xa0");
@@ -591,6 +633,16 @@ function sendSettingsUpdate(settingName, newValue) {
   });
 }
 
+function sendSomethingUnexpected() {
+  var message = {
+    type: "somethingUnexpected",
+  };
+  drone.publish({
+    room: room.name,
+    message: message
+  });
+}
+
 function sendStatement() {
   statementText = document.getElementById("questionField").value;
   if (statementText.length >= 8) {
@@ -636,6 +688,16 @@ function updateMembers() {
   }
 }
 
+function updatePercentChanceOfSomethingUnexpected() {
+  sendSettingsUpdate("percentChanceOfSomethingUnexpected", document.getElementById("percentChanceOfSomethingUnexpectedField").value);
+}
+
+function updateSomethingUnexpectedCanHappen() {
+  sendSettingsUpdate("somethingUnexpectedCanHappen", document.getElementById("somethingUnexpectedCanHappenCheckbox").checked);
+}
+
+//initial state setup
+
 document.getElementById("answerCard").hidden = true;
 document.getElementById("givenAnswerCard").hidden = true;
 document.getElementById("logCard").hidden = true;
@@ -647,6 +709,12 @@ document.getElementById("usersConnectedRow").hidden = true;
 document.getElementById("makeStatementButtonSpan").hidden = true;
 document.getElementById("enterButtonInfoText").hidden = true;
 document.getElementById("usersConnectedRow").style.display = "none !important";
+document.getElementById("answerCard").hidden = true;
+document.getElementById("confirmChanceButtonDiv").hidden = true;
+document.getElementById("somethingUnexpectedCanHappenCheckbox").checked = true;
+document.getElementById("percentChanceOfSomethingUnexpectedField").value = 3;
+document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
+
 settingsButtons = document.getElementsByClassName("settingsButtonSpans");
 for (var i = 0; i < settingsButtons.length; i++) {
   settingsButtons[i].hidden = true;

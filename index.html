@@ -127,6 +127,25 @@
                 <span>Allow players to make statements?</span>
               </label>
             </p>
+            <p>
+              <label>
+                <input type="checkbox" onclick="updateSomethingUnexpectedCanHappen()" id="somethingUnexpectedCanHappenCheckbox" />
+                <span>"Something unexpected happens!" messages can randomly appear?</span>
+              </label>
+            </p>
+            <div id="percentChanceOfSomethingUnexpectedDiv">
+              <div class="row putInline likeSettings">
+                <br>
+                <span>
+                  Percent chance of Something Unexpected happening?&nbsp;&nbsp;
+                  <input onchange="onChangeOfChanceOfSomethingUnexpectedField()" style="width: 50px;" type="number" min="1" max="100" id="percentChanceOfSomethingUnexpectedField">
+                  %&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <span id="confirmChanceButtonDiv">
+                    <a onclick="updatePercentChanceOfSomethingUnexpected()" class="btn-small grey darken-3 beInline">Confirm</a>
+                  </span>
+                </span>
+              </div>
+            </div>
           </div>
           <div class="card-action center">
             <a onclick="hideAndApplySettings()" class="btn-small grey darken-3">Done</a>
