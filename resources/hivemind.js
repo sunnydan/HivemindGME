@@ -11,12 +11,17 @@ var countdownStarted = false;
 var playersCanMakeStatements = false;
 var settingsButtons;
 
-document.addEventListener('keyup', (e) => {
+document.addEventListener('keyup', (e) => { //There are a lot of problems that can be caused here if Enter is pushed at the wrong times. Fix.
   if (e.code === "Enter") {
     if (mode == "notConnected") {
       joinRoom();
     } else if (mode == "question") {
-      sendQuestion();
+      questionText = document.getElementById("questionField").value;
+      if (!playersCanMakeStatements || questionText.charAt(questionText.length - 1) == '?') {
+        sendQuestion();
+      } else { //if players CAN make statements, AND the text DOESN'T end in a question mark, send a statment.
+        sendStatement();
+      }
     } else {
       sendAnswer();
     }
@@ -457,7 +462,14 @@ function onSettingsUpdate(data) {
   switch (setting) {
     case "playersCanMakeStatements":
       playersCanMakeStatements = newValue;
+      document.getElementById("playersCanMakeStatementsCheckbox").checked = playersCanMakeStatements;
       document.getElementById("makeStatementButtonSpan").hidden = !playersCanMakeStatements;
+      document.getElementById("enterButtonInfoText").hidden = !playersCanMakeStatements;
+      if (playersCanMakeStatements) {
+        document.getElementById("questionField").placeholder = "Enter your question/statement";
+      } else {
+        document.getElementById("questionField").placeholder = "Ask your question";
+      }
       break;
     default:
       //donothing
@@ -633,6 +645,7 @@ document.getElementById("yesNoControls").hidden = true;
 document.getElementById("numericControls").hidden = true;
 document.getElementById("usersConnectedRow").hidden = true;
 document.getElementById("makeStatementButtonSpan").hidden = true;
+document.getElementById("enterButtonInfoText").hidden = true;
 document.getElementById("usersConnectedRow").style.display = "none !important";
 settingsButtons = document.getElementsByClassName("settingsButtonSpans");
 for (var i = 0; i < settingsButtons.length; i++) {
