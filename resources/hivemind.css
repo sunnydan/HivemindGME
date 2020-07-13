@@ -33,7 +33,11 @@ main {
   margin-bottom: 0px;
 }
 
-ul, li {
+.discList {
+  list-style-type: disc !important;
+}
+
+.circleList {
   list-style-type: circle !important;
 }
 
