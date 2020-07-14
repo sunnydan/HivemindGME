@@ -119,6 +119,7 @@ function isYesOrNoQuestion(questionText) {
 }
 
 function joinRoom() {
+  document.getElementById("joinRoomButtonDiv").hidden = true;
   var validJoin = true;
   if (document.getElementById("userNameField").value == "") {
     document.getElementById("userNameField").classList.add("invalid");
