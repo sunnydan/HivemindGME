@@ -168,6 +168,8 @@ function joinRoom() {
       mode = "question";
       onNewMode();
     });
+  } else {
+    document.getElementById("joinRoomButtonDiv").hidden = false;
   }
 }
 
