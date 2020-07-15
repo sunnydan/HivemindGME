@@ -21,3 +21,7 @@ If you'd like to contribute, email me, and we'll talk about it.
 * **Daniel Hilla** - *all of it so far* - [sunnydan](https://github.com/sunnydan)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+
+## License
+
+[GNU GPLv3](https://github.com/sunnydan/HivemindGME/blob/master/LICENSE)
