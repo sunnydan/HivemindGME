@@ -12,6 +12,7 @@ var playersCanMakeStatements = false;
 var settingsButtons;
 var somethingUnexpectedCanHappen = true;
 var percentChanceOfSomethingUnexpected = 3;
+var livePlayMode = false;
 
 document.addEventListener('keyup', (e) => { //There are a lot of problems that can be caused here if Enter is pushed at the wrong times. Fix.
   if (e.code === "Enter") {
@@ -217,10 +218,10 @@ function onChangeOfChanceOfSomethingUnexpectedField() {
   var currentValue = document.getElementById("percentChanceOfSomethingUnexpectedField").value;
   if (currentValue != percentChanceOfSomethingUnexpected) {
     document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "white";
-    document.getElementById("confirmChanceButtonDiv").hidden = false;
+    document.getElementById("confirmChanceButtonSpan").hidden = false;
   } else {
     document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
-    document.getElementById("confirmChanceButtonDiv").hidden = true;
+    document.getElementById("confirmChanceButtonSpan").hidden = true;
   }
 }
 
@@ -376,6 +377,7 @@ function onFinalAnswer(data) {
 
 function onMessage(message) {
   var data = message.data;
+  console.log(message);
   switch (data.type) {
     case "answer":
       onAnswer(data);
@@ -386,8 +388,11 @@ function onMessage(message) {
     case "finalAnswer":
       onFinalAnswer(data);
       break;
+    case "buttonQuestion":
+      onQuestion(message, true);
+      break;
     case "question":
-      onQuestion(message);
+      onQuestion(message, false);
       break;
     case "settingsUpdate":
       onSettingsUpdate(data);
@@ -452,20 +457,29 @@ function onNewMode() {
   } else {}
 }
 
-function onQuestion(message) {
+function onQuestion(message, isButtonQuestion) {
   var data = message.data;
-  var Pnode = document.createElement("P");
-  var Strongnode = document.createElement("Strong");
-  var fromUser = message.member.clientData.username;
-  var textnode = document.createTextNode(fromUser + "'s Question:\xa0\xa0");
-  Strongnode.appendChild(textnode);
-  Pnode.appendChild(Strongnode);
-  var textnode = document.createTextNode(data.messageText);
-  Pnode.appendChild(textnode);
-  document.getElementById("questionsAndAnswers").appendChild(Pnode);
 
-  var questionText = data.messageText;
-  document.getElementById("currentQuestion").textContent = questionText;
+  if (isButtonQuestion) {
+    document.getElementById("currentQuestion").textContent = "Give an answer";
+  } else {
+    document.getElementById("currentQuestion").textContent = data.messageText;
+
+    var Pnode = document.createElement("P");
+    var Strongnode = document.createElement("Strong");
+    var textnode;
+    if (livePlayMode) {
+      textnode = document.createTextNode("Question:\xa0\xa0");
+    } else {
+      var fromUser = message.member.clientData.username;
+      textnode = document.createTextNode(fromUser + "'s Question:\xa0\xa0");
+    }
+    Strongnode.appendChild(textnode);
+    Pnode.appendChild(Strongnode);
+    var textnode = document.createTextNode(data.messageText);
+    Pnode.appendChild(textnode);
+    document.getElementById("questionsAndAnswers").appendChild(Pnode);
+  }
 
   if (isYesOrNoQuestion(questionText)) {
     document.getElementById("yesNoControls").hidden = false;
@@ -485,15 +499,52 @@ function onSettingsUpdate(data) {
   var setting = data.setting;
   var newValue = data.newValue;
   switch (setting) {
+    case "livePlayMode":
+      livePlayMode = newValue;
+      if (livePlayMode) {
+        document.getElementById("askQuestionButton").textContent = "Ask Question Anonymously";
+        if (playersCanMakeStatements) {
+          document.getElementById("questionField").placeholder = "Enter an anonymous question/statement";
+        } else {
+          document.getElementById("questionField").placeholder = "Ask an anonymous question";
+        }
+      } else {
+        document.getElementById("askQuestionButton").textContent = "Ask Question";
+        if (playersCanMakeStatements) {
+          document.getElementById("questionField").placeholder = "Enter a question/statement";
+        } else {
+          document.getElementById("questionField").placeholder = "Ask a question";
+        }
+      }
+
+      livePlayButtons = document.getElementsByClassName("livePlayButtons");
+      for (var i = 0; i < livePlayButtons.length; i++) {
+        livePlayButtons[i].hidden = !livePlayMode;
+      }
+      break;
+    case "percentChanceOfSomethingUnexpected":
+      percentChanceOfSomethingUnexpected = newValue;
+      document.getElementById("percentChanceOfSomethingUnexpectedField").value = percentChanceOfSomethingUnexpected;
+      document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
+      document.getElementById("confirmChanceButtonSpan").hidden = true;
+      break;
     case "playersCanMakeStatements":
       playersCanMakeStatements = newValue;
       document.getElementById("playersCanMakeStatementsCheckbox").checked = playersCanMakeStatements;
       document.getElementById("makeStatementButtonSpan").hidden = !playersCanMakeStatements;
       document.getElementById("enterButtonInfoText").hidden = !playersCanMakeStatements;
       if (playersCanMakeStatements) {
-        document.getElementById("questionField").placeholder = "Enter your question/statement";
+        if (livePlayMode) {
+          document.getElementById("questionField").placeholder = "Enter an anonymous question/statement";
+        } else {
+          document.getElementById("questionField").placeholder = "Enter a question/statement";
+        }
       } else {
-        document.getElementById("questionField").placeholder = "Ask your question";
+        if (livePlayMode) {
+          document.getElementById("questionField").placeholder = "Ask an anonymous question";
+        } else {
+          document.getElementById("questionField").placeholder = "Ask a question";
+        }
       }
       break;
     case "somethingUnexpectedCanHappen":
@@ -501,12 +552,7 @@ function onSettingsUpdate(data) {
       document.getElementById("somethingUnexpectedCanHappenCheckbox").checked = somethingUnexpectedCanHappen;
       document.getElementById("percentChanceOfSomethingUnexpectedDiv").hidden = !somethingUnexpectedCanHappen;
       break;
-    case "percentChanceOfSomethingUnexpected":
-      percentChanceOfSomethingUnexpected = newValue;
-      document.getElementById("percentChanceOfSomethingUnexpectedField").value = percentChanceOfSomethingUnexpected;
-      document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
-      document.getElementById("confirmChanceButtonDiv").hidden = true;
-      break;
+
     default:
       //donothing
   }
@@ -603,17 +649,46 @@ function sendFinalAnswer(text) {
   });
 }
 
-function sendQuestion() {
-  questionText = document.getElementById("questionField").value;
+function sendQuestion(type) {
+  questionText = "";
+  isButtonQuestion = false;
+  console.log(type);
+  switch (type) {
+    case undefined:
+      questionText = document.getElementById("questionField").value;
+      break;
+    case "yesOrNo":
+      questionText = "is it really";
+      isButtonQuestion = true;
+      break;
+    case "numeric":
+      questionText = "how many";
+      isButtonQuestion = true;
+      break;
+    case "openEnded":
+      questionText = "min8characters";
+      isButtonQuestion = true;
+      break;
+    default:
+      //do nothing
+  }
   if (questionText.length >= 8) {
     document.getElementById("questionField").classList.remove("invalid");
     if (questionText.charAt(questionText.length - 1) != '?') {
       questionText = questionText.concat("?");
     }
-    var message = {
-      type: "question",
-      messageText: questionText
-    };
+    var message;
+    if (isButtonQuestion) {
+      message = {
+        type: "buttonQuestion",
+        messageText: questionText
+      };
+    } else {
+      message = {
+        type: "question",
+        messageText: questionText
+      };
+    }
     drone.publish({
       room: room.name,
       message: message
@@ -668,6 +743,10 @@ function sendStatement() {
   }
 }
 
+function updateLivePlayMode() {
+  sendSettingsUpdate("livePlayMode", document.getElementById("livePlayModeCheckbox").checked);
+}
+
 function updateMakeStatements() {
   sendSettingsUpdate("playersCanMakeStatements", document.getElementById("playersCanMakeStatementsCheckbox").checked);
 }
@@ -713,7 +792,7 @@ document.getElementById("makeStatementButtonSpan").hidden = true;
 document.getElementById("enterButtonInfoText").hidden = true;
 document.getElementById("usersConnectedRow").style.display = "none !important";
 document.getElementById("answerCard").hidden = true;
-document.getElementById("confirmChanceButtonDiv").hidden = true;
+document.getElementById("confirmChanceButtonSpan").hidden = true;
 document.getElementById("somethingUnexpectedCanHappenCheckbox").checked = true;
 document.getElementById("percentChanceOfSomethingUnexpectedField").value = 3;
 document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
@@ -721,6 +800,11 @@ document.getElementById("percentChanceOfSomethingUnexpectedField").style.color =
 settingsButtons = document.getElementsByClassName("settingsButtonSpans");
 for (var i = 0; i < settingsButtons.length; i++) {
   settingsButtons[i].hidden = true;
+}
+
+livePlayButtons = document.getElementsByClassName("livePlayButtons");
+for (var i = 0; i < livePlayButtons.length; i++) {
+  livePlayButtons[i].hidden = true;
 }
 
 Element.prototype.documentOffsetTop = function() {

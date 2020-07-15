@@ -13,7 +13,7 @@
 <body>
   <nav>
     <div class="nav-wrapper grey darken-4">
-      <span class="brand-logo center hide-on-small-only">The Hivemind GM Emulator v1.7</span>
+      <span class="brand-logo center hide-on-small-only">The Hivemind GM Emulator v1.8</span>
       <span class="brand-logo center hide-on-med-and-up">HGME v1.5</span>
     </div>
   </nav>
@@ -53,16 +53,27 @@
         <div class="card deep-purple darken-4 scale-transition scale-out" id="questionCard">
           <div class="card-content white-text">
             <div class="input-field">
-              <input class="whitePlaceholder validate" placeholder="Ask your question" type="text" minlength="8" id="questionField"></input>
+              <input class="whitePlaceholder validate beInline" placeholder="Ask a question" type="text" minlength="8" id="questionField"></input>
               <span class="helper-text" data-error="Question must be at least 8 characters"></span>
-              <span class="white-text" id="enterButtonInfoText">Pressing 'Enter' will submit the text as a statement, unless the text ends in a question mark.</span>
+              <span class="white-text" id="enterButtonInfoText"><small>Pressing 'Enter' will submit the text as a statement, unless the text ends in a question mark.</small></span>
             </div>
           </div>
           <div class="card-action center">
             <div class="row putInline">
-              <a onclick="sendQuestion()" class="btn-small grey darken-3 beInline">Ask Question</a>
+              <span class="beInline" id="askQuestionButtonSpan">
+                <a onclick="sendQuestion()" class="btn-small grey darken-3 beInline" id="askQuestionButton">Ask Question</a>
+              </span>
               <span class="beInline" id="makeStatementButtonSpan">
                 <a onclick="sendStatement()" class="btn-small grey darken-3">Make Statement</a>
+              </span>
+              <span class="beInline livePlayButtons" id="">
+                <a onclick="sendQuestion('yesOrNo')" class="btn-small grey darken-3">Yes or No Question</a>
+              </span>
+              <span class="beInline livePlayButtons" id="">
+                <a onclick="sendQuestion('numeric')" class="btn-small grey darken-3">Numeric Question</a>
+              </span>
+              <span class="beInline livePlayButtons" id="">
+                <a onclick="sendQuestion('openEnded')" class="btn-small grey darken-3">Open-ended Question</a>
               </span>
             </div>
           </div>
@@ -142,12 +153,18 @@
                   Percent chance of Something Unexpected happening?&nbsp;&nbsp;
                   <input onchange="onChangeOfChanceOfSomethingUnexpectedField()" style="width: 50px;" type="number" min="1" max="100" id="percentChanceOfSomethingUnexpectedField">
                   %&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  <span id="confirmChanceButtonDiv">
+                  <span id="confirmChanceButtonSpan">
                     <a onclick="updatePercentChanceOfSomethingUnexpected()" class="btn-small grey darken-3 beInline">Confirm</a>
                   </span>
                 </span>
               </div>
             </div>
+            <p>
+              <label>
+                <input type="checkbox" onclick="updateLivePlayMode()" id="livePlayModeCheckbox" />
+                <span>Live play mode? <small><i>(check if you are in a voice call, or in the same room as your other players)</i></small></span>
+              </label>
+            </p>
           </div>
           <div class="card-action center">
             <a onclick="hideAndApplySettings()" class="btn-small grey darken-3">Done</a>
