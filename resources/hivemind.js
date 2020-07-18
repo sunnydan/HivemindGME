@@ -12,6 +12,9 @@ var playersCanMakeStatements = false;
 var settingsButtons;
 var somethingUnexpectedCanHappen = true;
 var percentChanceOfSomethingUnexpected = 3;
+var yesOrNoTiming = 10;
+var numericTiming = 20;
+var opendEndedTiming = 30;
 var livePlayMode = false;
 
 document.addEventListener('keyup', (e) => { //There are a lot of problems that can be caused here if Enter is pushed at the wrong times. Fix.
@@ -197,11 +200,11 @@ function onAnswer(data) {
       answers.push(data.messageText);
       if (answers.length > 0 && membersArray.length > 1 && !countdownStarted) {
         if (isYesOrNoQuestion(document.getElementById("currentQuestion").textContent)) {
-          sendCountdown(10);
+          sendCountdown(yesOrNoTiming);
         } else if (isNumericQuestion(document.getElementById("currentQuestion").textContent)) {
-          sendCountdown(20);
+          sendCountdown(numericTiming);
         } else {
-          sendCountdown(30);
+          sendCountdown(opendEndedTiming);
         }
       }
     } else {
@@ -222,6 +225,27 @@ function onChangeOfChanceOfSomethingUnexpectedField() {
   } else {
     document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
     document.getElementById("confirmChanceButtonSpan").hidden = true;
+  }
+}
+
+function onChangeOfYesOrNoTiming() {
+  var currentValue = document.getElementById("yesOrNoTimingField").value;
+  if(currentValue != yesOrNoTiming){
+    sendSettingsUpdate("yesOrNoTiming", currentValue);
+  }
+}
+
+function onChangeOfNumericTiming() {
+  var currentValue = document.getElementById("numericTimingField").value;
+  if(currentValue != numericTiming){
+    sendSettingsUpdate("numericTiming", currentValue);
+  }
+}
+
+function onChangeOfOpenEndedTiming() {
+  var currentValue = document.getElementById("openEndedTimingField").value;
+  if(currentValue != opendEndedTiming){
+    sendSettingsUpdate("opendEndedTiming", currentValue);
   }
 }
 
@@ -552,6 +576,18 @@ function onSettingsUpdate(data) {
       document.getElementById("somethingUnexpectedCanHappenCheckbox").checked = somethingUnexpectedCanHappen;
       document.getElementById("percentChanceOfSomethingUnexpectedDiv").hidden = !somethingUnexpectedCanHappen;
       break;
+    case "yesOrNoTiming":
+      yesOrNoTiming = newValue;
+      document.getElementById("yesOrNoTimingField").value = yesOrNoTiming;
+      break;
+    case "numericTiming":
+      numericTiming = newValue;
+      document.getElementById("numericTiming").value = numericTiming;
+      break;
+    case "opendEndedTiming":
+        opendEndedTiming = newValue;
+        document.getElementById("opendEndedTiming").value = opendEndedTiming;
+        break;
 
     default:
       //donothing
@@ -795,6 +831,9 @@ document.getElementById("answerCard").hidden = true;
 document.getElementById("confirmChanceButtonSpan").hidden = true;
 document.getElementById("somethingUnexpectedCanHappenCheckbox").checked = true;
 document.getElementById("percentChanceOfSomethingUnexpectedField").value = 3;
+document.getElementById("yesOrNoTimingField").value = yesOrNoTiming;
+document.getElementById("numericTimingField").value = numericTiming;
+document.getElementById("openEndedTimingField").value = opendEndedTiming;
 document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
 
 settingsButtons = document.getElementsByClassName("settingsButtonSpans");

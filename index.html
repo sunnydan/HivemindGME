@@ -159,6 +159,19 @@
                 </span>
               </div>
             </div>
+            <div id=responseTimingsDiv>
+              <div class="row putInline likeSettings">
+                <span>
+                  Time to answer: Yes or No
+                  <input onchange="onChangeOfYesOrNoTiming()" style="width: 50px;" type="number" min="1" max="120" id="yesOrNoTimingField">
+                  Numeric
+                  <input onchange="onChangeOfNumericTiming()" style="width: 50px;" type="number" min="1" max="120" id="numericTimingField">
+                  Open Ended
+                  <input onchange="onChangeOfOpenEndedTiming()" style="width: 50px;" type="number" min="1" max="120" id="openEndedTimingField">
+
+                </span>
+              </div>
+            </div>
             <p>
               <label>
                 <input type="checkbox" onclick="updateLivePlayMode()" id="livePlayModeCheckbox" />
