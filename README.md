@@ -14,7 +14,7 @@ To use it, pick a room name and a username, and click "Join/Create Room". Once a
 
 ## Contributing
 
-If you'd like to contribute, email me, and we'll talk about it.
+If you'd like to contribute take a look at the [Todo list Google Doc](https://docs.google.com/document/d/1zrgOAGgXkXTt6W8Bt8KQJQUncvBjg8xGq870sa6rgG8/edit?usp=sharing), and make a comment about what you intend on doing.
 
 ## Authors
 
