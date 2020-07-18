@@ -18,9 +18,7 @@ If you'd like to contribute, email me, and we'll talk about it.
 
 ## Authors
 
-* **Daniel Hilla** - *all of it so far* - [sunnydan](https://github.com/sunnydan)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See the list of [contributors](https://github.com/sunnydan/HivemindGME/contributors) who participated in this project.
 
 ## License
 
