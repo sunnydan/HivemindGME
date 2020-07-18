@@ -134,53 +134,55 @@
         <div class="card indigo darken-4 scale-transition scale-out" id="settingsCard">
           <div class="card-content white-text">
             <span class="card-title white-text">Settings</span>
-            <p>
-              <label>
-                <input type="checkbox" onclick="updateMakeStatements()" id="playersCanMakeStatementsCheckbox" />
-                <span>Allow players to make statements?</span>
-              </label>
-            </p>
-            <p>
-              <label>
-                <input type="checkbox" onclick="updateSomethingUnexpectedCanHappen()" id="somethingUnexpectedCanHappenCheckbox" />
-                <span>"Something unexpected happens!" messages can randomly appear?</span>
-              </label>
-            </p>
-            <div id="percentChanceOfSomethingUnexpectedDiv">
-              <div class="row putInline likeSettings">
-                <br>
-                <span>
-                  Percent chance of Something Unexpected happening?&nbsp;&nbsp;
-                  <input onchange="onChangeOfChanceOfSomethingUnexpectedField()" style="width: 50px;" type="number" min="1" max="100" id="percentChanceOfSomethingUnexpectedField">
-                  %&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  <span id="confirmChanceButtonSpan">
-                    <a onclick="updatePercentChanceOfSomethingUnexpected()" class="btn-small grey darken-3 beInline">Confirm</a>
+            <div id="settingsDiv">
+              <p>
+                <label>
+                  <input type="checkbox" onclick="updateMakeStatements()" id="playersCanMakeStatementsCheckbox" />
+                  <span>Allow players to make statements?</span>
+                </label>
+              </p>
+              <p>
+                <label>
+                  <input type="checkbox" onclick="updateLivePlayMode()" id="livePlayModeCheckbox" />
+                  <span>Live play mode? <small><i>(check if you are in a voice call, or in the same room as your other players)</i></small></span>
+                </label>
+              </p>
+              <p>
+                <label>
+                  <input type="checkbox" onclick="updateSomethingUnexpectedCanHappen()" id="somethingUnexpectedCanHappenCheckbox" />
+                  <span>"Something unexpected happens!" messages can randomly appear?</span>
+                </label>
+              </p>
+              <div id="percentChanceOfSomethingUnexpectedDiv">
+                <div class="displayFlex likeSettings">
+                  <br>
+                  <span>
+                    Percent chance of Something Unexpected happening?&nbsp;&nbsp;
+                    <input class="white-text center" onchange="onChangeOfNumericSetting()" style="width: 50px;" type="number" min="1" max="100" id="percentChanceOfSomethingUnexpectedField">
+                    %
                   </span>
-                </span>
+                </div>
+              </div>
+              <div id=responseTimingsDiv>
+                <div class="likeSettings">
+                  <span>
+                    Seconds to answer:
+                    <br>
+                    <small>Yes or no questions:</small>
+                    <input class="white-text center" onchange="onChangeOfNumericSetting()" style="width: 50px;" type="number" min="1" max="120" id="yesOrNoTimingField">
+                    &nbsp;&nbsp;
+                    <small>Numeric questions:</small>
+                    <input class="white-text center" onchange="onChangeOfNumericSetting()" style="width: 50px;" type="number" min="1" max="120" id="numericTimingField">
+                    &nbsp;&nbsp;
+                    <small>Open-ended questions:</small>
+                    <input class="white-text center" onchange="onChangeOfNumericSetting()" style="width: 50px;" type="number" min="1" max="120" id="openEndedTimingField">
+                  </span>
+                </div>
               </div>
             </div>
-            <div id=responseTimingsDiv>
-              <div class="row putInline likeSettings">
-                <span>
-                  Time to answer: Yes or No
-                  <input onchange="onChangeOfYesOrNoTiming()" style="width: 50px;" type="number" min="1" max="120" id="yesOrNoTimingField">
-                  Numeric
-                  <input onchange="onChangeOfNumericTiming()" style="width: 50px;" type="number" min="1" max="120" id="numericTimingField">
-                  Open Ended
-                  <input onchange="onChangeOfOpenEndedTiming()" style="width: 50px;" type="number" min="1" max="120" id="openEndedTimingField">
-
-                </span>
-              </div>
-            </div>
-            <p>
-              <label>
-                <input type="checkbox" onclick="updateLivePlayMode()" id="livePlayModeCheckbox" />
-                <span>Live play mode? <small><i>(check if you are in a voice call, or in the same room as your other players)</i></small></span>
-              </label>
-            </p>
           </div>
           <div class="card-action center">
-            <a onclick="hideAndApplySettings()" class="btn-small grey darken-3">Done</a>
+            <a onclick="hideAndApplySettings()" class="btn-small grey darken-3" id="exitSettingsButton">Done</a>
           </div>
         </div>
       </div>
@@ -193,14 +195,14 @@
           <span class="beInline">Connected Users: <span id="usersConnectedOutput"></span></span>
           <div class="beInline hide-on-small-only">
             <span class="settingsButtonSpans">
-              <a onclick="scaleToggleCardByID('settingsCard')" class="btn-small grey darken-3">Settings</a>
+              <a onclick="showSettingsCard()" class="btn-small grey darken-3">Settings</a>
             </span>
             <a onclick="leaveRoom()" class="btn-small red darken-4">Leave Room</a>
           </div>
         </div>
         <div class="row putInline hide-on-med-and-up">
           <span class="settingsButtonSpans">
-            <a onclick="scaleToggleCardByID('settingsCard')" class="btn-small grey darken-3 beInline">Settings</a>
+            <a onclick="showSettingsCard()" class="btn-small grey darken-3 beInline">Settings</a>
           </span>
           <a onclick="leaveRoom()" class="btn-small red darken-4 beInline">Leave Room</a>
         </div>

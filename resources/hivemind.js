@@ -14,8 +14,16 @@ var somethingUnexpectedCanHappen = true;
 var percentChanceOfSomethingUnexpected = 3;
 var yesOrNoTiming = 10;
 var numericTiming = 20;
-var opendEndedTiming = 30;
+var openEndedTiming = 30;
 var livePlayMode = false;
+var cardPreviousDisplays = {
+  answerCard: "block",
+  givenAnswerCard: "block",
+  logCard: "block",
+  logInCard: "block",
+  questionCard: "block",
+  settingsCard: "flex"
+};
 
 document.addEventListener('keyup', (e) => { //There are a lot of problems that can be caused here if Enter is pushed at the wrong times. Fix.
   if (e.code === "Enter") {
@@ -192,6 +200,10 @@ function leaveRoom() {
 
 function hideAndApplySettings() {
   scaleOutCardByID("settingsCard");
+  updateNumericSettings();
+  for (var i = 0; i < settingsButtons.length; i++) {
+    settingsButtons[i].hidden = false;
+  }
 }
 
 function onAnswer(data) {
@@ -204,7 +216,7 @@ function onAnswer(data) {
         } else if (isNumericQuestion(document.getElementById("currentQuestion").textContent)) {
           sendCountdown(numericTiming);
         } else {
-          sendCountdown(opendEndedTiming);
+          sendCountdown(openEndedTiming);
         }
       }
     } else {
@@ -217,36 +229,8 @@ function onAnswer(data) {
   }
 }
 
-function onChangeOfChanceOfSomethingUnexpectedField() {
-  var currentValue = document.getElementById("percentChanceOfSomethingUnexpectedField").value;
-  if (currentValue != percentChanceOfSomethingUnexpected) {
-    document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "white";
-    document.getElementById("confirmChanceButtonSpan").hidden = false;
-  } else {
-    document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
-    document.getElementById("confirmChanceButtonSpan").hidden = true;
-  }
-}
-
-function onChangeOfYesOrNoTiming() {
-  var currentValue = document.getElementById("yesOrNoTimingField").value;
-  if(currentValue != yesOrNoTiming){
-    sendSettingsUpdate("yesOrNoTiming", currentValue);
-  }
-}
-
-function onChangeOfNumericTiming() {
-  var currentValue = document.getElementById("numericTimingField").value;
-  if(currentValue != numericTiming){
-    sendSettingsUpdate("numericTiming", currentValue);
-  }
-}
-
-function onChangeOfOpenEndedTiming() {
-  var currentValue = document.getElementById("openEndedTimingField").value;
-  if(currentValue != opendEndedTiming){
-    sendSettingsUpdate("opendEndedTiming", currentValue);
-  }
+function onChangeOfNumericSetting() {
+  document.getElementById("exitSettingsButton").textContent = "Confirm Changes";
 }
 
 function onCountdown(data) {
@@ -318,7 +302,13 @@ function onCountdown(data) {
           determineFinalAnswer();
           break;
         default:
-          alert("something broke! Recieved countdown message with nonstandard count!");
+          if (data.messageText < 0) {
+            sendCountdown(0);
+          } else if (data.messageText > 30) {
+            setTimeout(() => {
+              sendCountdown(30);
+            }, 1000 * (data.messageText - 30));
+          }
       }
     }
   }
@@ -401,7 +391,6 @@ function onFinalAnswer(data) {
 
 function onMessage(message) {
   var data = message.data;
-  console.log(message);
   switch (data.type) {
     case "answer":
       onAnswer(data);
@@ -438,9 +427,9 @@ function onNewMode() {
       settingsButtons[i].hidden = false;
     }
   } else {
-    for (var i = 0; i < settingsButtons.length; i++) {
-      settingsButtons[i].hidden = true;
-    }
+    // for (var i = 0; i < settingsButtons.length; i++) {
+    //   settingsButtons[i].hidden = true;
+    // }
   }
   if (mode == "question") {
     scaleOutCardByID("logInCard");
@@ -483,6 +472,7 @@ function onNewMode() {
 
 function onQuestion(message, isButtonQuestion) {
   var data = message.data;
+  var questionText = data.messageText;
 
   if (isButtonQuestion) {
     document.getElementById("currentQuestion").textContent = "Give an answer";
@@ -546,11 +536,19 @@ function onSettingsUpdate(data) {
         livePlayButtons[i].hidden = !livePlayMode;
       }
       break;
-    case "percentChanceOfSomethingUnexpected":
-      percentChanceOfSomethingUnexpected = newValue;
+    case "numericSettings":
+      //percentChanceOfSomethingUnexpected
+      percentChanceOfSomethingUnexpected = parseInt(newValue[0]);
       document.getElementById("percentChanceOfSomethingUnexpectedField").value = percentChanceOfSomethingUnexpected;
-      document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
-      document.getElementById("confirmChanceButtonSpan").hidden = true;
+      //yesOrNoTiming
+      yesOrNoTiming = parseInt(newValue[1]);
+      document.getElementById("yesOrNoTimingField").value = yesOrNoTiming;
+      //numericTiming
+      numericTiming = parseInt(newValue[2]);
+      document.getElementById("numericTimingField").value = numericTiming;
+      //openEndedTiming
+      openEndedTiming = parseInt(newValue[3]);
+      document.getElementById("openEndedTimingField").value = openEndedTiming;
       break;
     case "playersCanMakeStatements":
       playersCanMakeStatements = newValue;
@@ -576,19 +574,6 @@ function onSettingsUpdate(data) {
       document.getElementById("somethingUnexpectedCanHappenCheckbox").checked = somethingUnexpectedCanHappen;
       document.getElementById("percentChanceOfSomethingUnexpectedDiv").hidden = !somethingUnexpectedCanHappen;
       break;
-    case "yesOrNoTiming":
-      yesOrNoTiming = newValue;
-      document.getElementById("yesOrNoTimingField").value = yesOrNoTiming;
-      break;
-    case "numericTiming":
-      numericTiming = newValue;
-      document.getElementById("numericTiming").value = numericTiming;
-      break;
-    case "opendEndedTiming":
-        opendEndedTiming = newValue;
-        document.getElementById("opendEndedTiming").value = opendEndedTiming;
-        break;
-
     default:
       //donothing
   }
@@ -621,20 +606,27 @@ function randomIntFromInterval(min, max) { // min and max included
 
 function scaleInCardByID(cardID) {
   var card = document.getElementById(cardID);
-  card.hidden = false;
-  setTimeout(() => {
-    card.classList.remove("scale-out");
-    card.classList.add("scale-in");
-  }, 200);
+  if (card.hidden == true) {
+    card.style.display = cardPreviousDisplays[card.id];
+    card.hidden = false;
+    setTimeout(() => {
+      card.classList.remove("scale-out");
+      card.classList.add("scale-in");
+    }, 200);
+  }
 }
 
 function scaleOutCardByID(cardID) {
   var card = document.getElementById(cardID);
-  card.classList.remove("scale-in");
-  card.classList.add("scale-out");
-  setTimeout(() => {
-    card.hidden = true;
-  }, 200);
+  if (card.hidden == false) {
+    card.classList.remove("scale-in");
+    card.classList.add("scale-out");
+    setTimeout(() => {
+      card.hidden = true;
+      cardPreviousDisplays[card.id] = card.style.display;
+      card.style.display = "none"
+    }, 200);
+  }
 }
 
 function scaleToggleCardByID(cardID) {
@@ -688,7 +680,6 @@ function sendFinalAnswer(text) {
 function sendQuestion(type) {
   questionText = "";
   isButtonQuestion = false;
-  console.log(type);
   switch (type) {
     case undefined:
       questionText = document.getElementById("questionField").value;
@@ -779,6 +770,14 @@ function sendStatement() {
   }
 }
 
+function showSettingsCard() {
+  document.getElementById("exitSettingsButton").textContent = "Done";
+  scaleToggleCardByID('settingsCard');
+  for (var i = 0; i < settingsButtons.length; i++) {
+    settingsButtons[i].hidden = true;
+  }
+}
+
 function updateLivePlayMode() {
   sendSettingsUpdate("livePlayMode", document.getElementById("livePlayModeCheckbox").checked);
 }
@@ -806,35 +805,46 @@ function updateMembers() {
   }
 }
 
-function updatePercentChanceOfSomethingUnexpected() {
-  sendSettingsUpdate("percentChanceOfSomethingUnexpected", document.getElementById("percentChanceOfSomethingUnexpectedField").value);
+function updateNumericSettings() {
+  sendSettingsUpdate(
+    "numericSettings", [
+      document.getElementById("percentChanceOfSomethingUnexpectedField").value,
+      document.getElementById("yesOrNoTimingField").value,
+      document.getElementById("numericTimingField").value,
+      document.getElementById("openEndedTimingField").value,
+    ]
+  );
 }
 
 function updateSomethingUnexpectedCanHappen() {
   sendSettingsUpdate("somethingUnexpectedCanHappen", document.getElementById("somethingUnexpectedCanHappenCheckbox").checked);
 }
 
-//initial state setup
+//INITIAL STATE SETUP
 
-document.getElementById("answerCard").hidden = true;
-document.getElementById("givenAnswerCard").hidden = true;
-document.getElementById("logCard").hidden = true;
-document.getElementById("questionCard").hidden = true;
-document.getElementById("settingsCard").hidden = true;
+var cards = [
+  document.getElementById("answerCard"),
+  document.getElementById("givenAnswerCard"),
+  document.getElementById("logCard"),
+  document.getElementById("questionCard"),
+  document.getElementById("settingsCard")
+];
+for (var i = 0; i < cards.length; i++) {
+  cards[i].hidden = true;
+  cards[i].style.display = "none";
+}
+
 document.getElementById("yesNoControls").hidden = true;
 document.getElementById("numericControls").hidden = true;
 document.getElementById("usersConnectedRow").hidden = true;
 document.getElementById("makeStatementButtonSpan").hidden = true;
 document.getElementById("enterButtonInfoText").hidden = true;
 document.getElementById("usersConnectedRow").style.display = "none !important";
-document.getElementById("answerCard").hidden = true;
-document.getElementById("confirmChanceButtonSpan").hidden = true;
 document.getElementById("somethingUnexpectedCanHappenCheckbox").checked = true;
 document.getElementById("percentChanceOfSomethingUnexpectedField").value = 3;
 document.getElementById("yesOrNoTimingField").value = yesOrNoTiming;
 document.getElementById("numericTimingField").value = numericTiming;
-document.getElementById("openEndedTimingField").value = opendEndedTiming;
-document.getElementById("percentChanceOfSomethingUnexpectedField").style.color = "lime";
+document.getElementById("openEndedTimingField").value = openEndedTiming;
 
 settingsButtons = document.getElementsByClassName("settingsButtonSpans");
 for (var i = 0; i < settingsButtons.length; i++) {
