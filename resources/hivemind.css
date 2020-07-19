@@ -41,6 +41,10 @@ main {
   color: white;
 }
 
+.off-white-text {
+  color: #e8e8e8;
+}
+
 .whitePlaceholder::placeholder {
   color: white;
 }
@@ -58,4 +62,8 @@ main {
 
 #settingsDiv {
   text-align: left;
+}
+
+#infoDiv ul, #infoDiv li {
+  margin-top: 5px;
 }
