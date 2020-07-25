@@ -472,12 +472,12 @@ function onNewMode() {
 
 function onQuestion(message, isButtonQuestion) {
   var data = message.data;
-  var questionText = data.messageText;
+  var questionText = data.messageText.trim();
 
   if (isButtonQuestion) {
     document.getElementById("currentQuestion").textContent = "Give an answer";
   } else {
-    document.getElementById("currentQuestion").textContent = data.messageText;
+    document.getElementById("currentQuestion").textContent = questionText;
 
     var Pnode = document.createElement("P");
     var Strongnode = document.createElement("Strong");
@@ -490,7 +490,7 @@ function onQuestion(message, isButtonQuestion) {
     }
     Strongnode.appendChild(textnode);
     Pnode.appendChild(Strongnode);
-    var textnode = document.createTextNode(data.messageText);
+    var textnode = document.createTextNode(questionText);
     Pnode.appendChild(textnode);
     document.getElementById("questionsAndAnswers").appendChild(Pnode);
   }
@@ -623,7 +623,9 @@ function scaleOutCardByID(cardID) {
     card.classList.add("scale-out");
     setTimeout(() => {
       card.hidden = true;
-      cardPreviousDisplays[card.id] = card.style.display;
+      if (card.style.display != "none") {
+        cardPreviousDisplays[card.id] = card.style.display;
+      }
       card.style.display = "none"
     }, 200);
   }
